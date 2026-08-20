@@ -371,7 +371,7 @@ export default function Contact() {
 
         {/* Right Side: Holographic Interactive Form */}
         <div
-          className="glass-panel"
+          className="glass-panel contact-form-panel"
           style={{
             padding: '36px',
             borderRadius: '24px',
@@ -542,12 +542,36 @@ export default function Contact() {
         @media (max-width: 900px) {
           .contact-grid {
             grid-template-columns: 1fr !important;
+            gap: 24px !important;
           }
           .form-row {
             grid-template-columns: 1fr !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .contact-card {
+            padding: 16px 12px !important;
+          }
+          .contact-form-panel {
+            padding: 20px 16px !important;
+          }
+        }
+        @media (max-width: 420px) {
+          .contact-card {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+          .contact-card > div:last-child {
+            width: 100% !important;
+            margin-top: 8px !important;
+          }
+          .contact-card button {
+            width: 100% !important;
+            justify-content: center !important;
           }
         }
       `}</style>
     </section>
   );
 }
+

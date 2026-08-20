@@ -88,7 +88,7 @@ export default function Hero() {
           {/* Primary Semantic H1 */}
           <h1
             style={{
-              fontSize: 'clamp(2.8rem, 6vw, 4.8rem)',
+              fontSize: 'clamp(2.2rem, 6vw, 4.8rem)',
               fontWeight: 800,
               lineHeight: 1.08,
               letterSpacing: '-0.03em',
@@ -105,9 +105,10 @@ export default function Hero() {
           <div
             style={{
               display: 'flex',
+              flexWrap: 'wrap',
               alignItems: 'center',
-              gap: '12px',
-              fontSize: 'clamp(1.25rem, 3vw, 1.85rem)',
+              gap: '10px',
+              fontSize: 'clamp(1.15rem, 3vw, 1.85rem)',
               fontFamily: 'var(--font-heading)',
               fontWeight: 600,
               color: 'var(--text-main)',
@@ -131,10 +132,10 @@ export default function Hero() {
           {/* Bio Description */}
           <p
             style={{
-              fontSize: '1.1rem',
+              fontSize: '1.05rem',
               color: 'var(--text-muted)',
               lineHeight: 1.7,
-              marginBottom: '36px',
+              marginBottom: '32px',
               maxWidth: '620px',
             }}
           >
@@ -143,12 +144,13 @@ export default function Hero() {
 
           {/* Action CTAs */}
           <div
+            className="hero-cta-group"
             style={{
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
-              gap: '16px',
-              marginBottom: '44px',
+              gap: '14px',
+              marginBottom: '40px',
             }}
           >
             <a
@@ -188,7 +190,7 @@ export default function Hero() {
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
-              gap: '14px',
+              gap: '12px',
             }}
           >
             <a
@@ -201,15 +203,15 @@ export default function Hero() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '8px 16px',
+                padding: '8px 14px',
                 borderRadius: '10px',
                 color: '#ffffff',
                 textDecoration: 'none',
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
                 fontFamily: 'var(--font-mono)',
               }}
             >
-              <Github size={16} style={{ color: 'var(--primary)' }} />
+              <Github size={15} style={{ color: 'var(--primary)' }} />
               <span>github/{data.personal.github}</span>
             </a>
 
@@ -223,16 +225,16 @@ export default function Hero() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '8px 16px',
+                padding: '8px 14px',
                 borderRadius: '10px',
                 color: '#ffffff',
                 textDecoration: 'none',
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
                 fontFamily: 'var(--font-mono)',
               }}
             >
-              <Instagram size={16} style={{ color: '#ec4899' }} />
-              <span>instagram/@{data.personal.instagram}</span>
+              <Instagram size={15} style={{ color: '#ec4899' }} />
+              <span>@{data.personal.instagram}</span>
             </a>
 
             <div
@@ -241,14 +243,14 @@ export default function Hero() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '8px 14px',
+                padding: '8px 12px',
                 borderRadius: '10px',
                 color: 'var(--text-muted)',
-                fontSize: '0.82rem',
+                fontSize: '0.80rem',
                 fontFamily: 'var(--font-mono)',
               }}
             >
-              <MapPin size={14} style={{ color: 'var(--primary)' }} />
+              <MapPin size={13} style={{ color: 'var(--primary)' }} />
               <span>{data.personal.location}</span>
             </div>
           </div>
@@ -257,9 +259,9 @@ export default function Hero() {
         {/* Right Column Hologram Quick Card */}
         <div className="hero-right-card" style={{ position: 'relative' }}>
           <div
-            className="glass-panel"
+            className="glass-panel hero-hud-card"
             style={{
-              padding: '36px',
+              padding: '32px',
               borderRadius: '24px',
               border: '1px solid var(--border-glass-hover)',
               boxShadow: '0 25px 60px rgba(0, 0, 0, 0.6), 0 0 30px var(--primary-glow)',
@@ -275,12 +277,12 @@ export default function Hero() {
                 justifyContent: 'space-between',
                 borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                 paddingBottom: '16px',
-                marginBottom: '24px',
+                marginBottom: '20px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Sparkles size={18} style={{ color: 'var(--primary)' }} />
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--primary)' }}>
+                <Sparkles size={16} style={{ color: 'var(--primary)' }} />
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.80rem', color: 'var(--primary)' }}>
                   DEVELOPER_HUD // ACTIVE
                 </span>
               </div>
@@ -291,11 +293,12 @@ export default function Hero() {
 
             {/* Core Stats Grid */}
             <div
+              className="hero-stats-grid"
               style={{
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
-                gap: '16px',
-                marginBottom: '24px',
+                gap: '14px',
+                marginBottom: '20px',
               }}
             >
               <div
@@ -376,12 +379,36 @@ export default function Hero() {
         @media (max-width: 960px) {
           .hero-grid {
             grid-template-columns: 1fr !important;
+            gap: 32px !important;
           }
           .hero-right-card {
-            margin-top: 20px;
+            margin-top: 10px;
+          }
+        }
+        @media (max-width: 640px) {
+          #hero {
+            padding: 100px 14px 50px !important;
+          }
+          .hero-cta-group {
+            gap: 10px !important;
+            margin-bottom: 30px !important;
+          }
+          .hero-cta-group a {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          .hero-hud-card {
+            padding: 20px 16px !important;
+          }
+        }
+        @media (max-width: 380px) {
+          .hero-stats-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
           }
         }
       `}</style>
     </section>
   );
 }
+

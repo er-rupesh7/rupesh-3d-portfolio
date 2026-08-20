@@ -55,12 +55,13 @@ export default function Projects() {
 
       {/* Filter Tabs */}
       <div
+        className="projects-filter-pills"
         style={{
           display: 'flex',
           flexWrap: 'wrap',
           justifyContent: 'center',
-          gap: '10px',
-          marginBottom: '48px',
+          gap: '8px',
+          marginBottom: '36px',
         }}
       >
         {categories.map((cat) => {
@@ -73,20 +74,20 @@ export default function Projects() {
                 setActiveCategory(cat);
               }}
               onMouseEnter={() => playSound('hover')}
-              className="interactive"
+              className="interactive project-filter-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '10px 20px',
-                borderRadius: '12px',
+                gap: '6px',
+                padding: '8px 16px',
+                borderRadius: '10px',
                 fontFamily: 'var(--font-heading)',
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 fontWeight: isActive ? 600 : 500,
                 color: isActive ? '#000000' : '#ffffff',
                 backgroundColor: isActive ? 'var(--primary)' : 'rgba(255, 255, 255, 0.04)',
                 border: `1px solid ${isActive ? 'var(--primary)' : 'rgba(255, 255, 255, 0.1)'}`,
-                boxShadow: isActive ? '0 0 20px var(--primary-glow)' : 'none',
+                boxShadow: isActive ? '0 0 16px var(--primary-glow)' : 'none',
                 cursor: 'pointer',
                 transition: 'var(--transition-smooth)',
               }}
@@ -99,18 +100,19 @@ export default function Projects() {
 
       {/* Projects Grid */}
       <div
+        className="projects-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-          gap: '32px',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+          gap: '24px',
         }}
       >
         {filteredProjects.map((project) => (
           <Card3DTilt key={project.id} maxTilt={10}>
             <div
-              className="glass-panel"
+              className="glass-panel project-card"
               style={{
-                padding: '30px',
+                padding: '24px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -122,14 +124,14 @@ export default function Projects() {
                 {/* Visual Gradient Banner / Header */}
                 <div
                   style={{
-                    height: '140px',
-                    borderRadius: '14px',
+                    height: '130px',
+                    borderRadius: '12px',
                     background: project.imageGradient,
-                    marginBottom: '20px',
+                    marginBottom: '16px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    padding: '16px',
+                    padding: '14px',
                     position: 'relative',
                     overflow: 'hidden',
                   }}
@@ -148,71 +150,45 @@ export default function Projects() {
                         background: 'rgba(0, 0, 0, 0.45)',
                         backdropFilter: 'blur(8px)',
                         color: '#ffffff',
-                        fontSize: '0.75rem',
+                        fontSize: '0.72rem',
                         fontFamily: 'var(--font-mono)',
                         fontWeight: 600,
                       }}
                     >
                       {project.category}
                     </span>
-
-                    {project.starsCount && (
-                      <div
+                    {project.featured && (
+                      <span
                         style={{
-                          display: 'flex',
+                          display: 'inline-flex',
                           alignItems: 'center',
                           gap: '4px',
-                          padding: '4px 10px',
-                          borderRadius: '999px',
-                          background: 'rgba(0, 0, 0, 0.45)',
-                          backdropFilter: 'blur(8px)',
-                          color: '#facc15',
-                          fontSize: '0.75rem',
+                          padding: '4px 8px',
+                          borderRadius: '8px',
+                          background: 'rgba(0, 240, 255, 0.25)',
+                          color: '#00f0ff',
+                          fontSize: '0.70rem',
                           fontFamily: 'var(--font-mono)',
+                          fontWeight: 700,
                         }}
                       >
-                        <Star size={12} fill="#facc15" />
-                        <span>{project.starsCount}</span>
-                      </div>
+                        <Star size={11} fill="#00f0ff" />
+                        <span>FEATURED</span>
+                      </span>
                     )}
                   </div>
 
-                  {project.metrics && (
-                    <div
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '0.78rem',
-                        color: '#ffffff',
-                        background: 'rgba(0, 0, 0, 0.5)',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        display: 'inline-block',
-                        maxWidth: 'fit-content',
-                      }}
-                    >
-                      ⚡ {project.metrics}
-                    </div>
-                  )}
+                  <div style={{ color: '#ffffff', fontWeight: 800, fontSize: '1.25rem' }}>
+                    {project.title}
+                  </div>
                 </div>
-
-                {/* Project Title */}
-                <h3
-                  style={{
-                    fontSize: '1.35rem',
-                    fontWeight: 700,
-                    marginBottom: '8px',
-                    color: '#ffffff',
-                  }}
-                >
-                  {project.title}
-                </h3>
 
                 <p
                   style={{
                     color: 'var(--primary)',
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.82rem',
-                    marginBottom: '14px',
+                    marginBottom: '10px',
                   }}
                 >
                   {project.tagline}
@@ -221,9 +197,9 @@ export default function Projects() {
                 <p
                   style={{
                     color: 'var(--text-muted)',
-                    fontSize: '0.92rem',
+                    fontSize: '0.90rem',
                     lineHeight: 1.6,
-                    marginBottom: '20px',
+                    marginBottom: '18px',
                   }}
                 >
                   {project.description}
@@ -235,19 +211,19 @@ export default function Projects() {
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: '6px',
-                    marginBottom: '24px',
+                    marginBottom: '20px',
                   }}
                 >
-                  {project.tags.map((tag, tIdx) => (
+                  {project.tags.map((tag, idx) => (
                     <span
-                      key={tIdx}
+                      key={idx}
                       style={{
-                        padding: '4px 10px',
+                        padding: '3px 8px',
                         borderRadius: '6px',
                         background: 'rgba(255, 255, 255, 0.04)',
                         border: '1px solid rgba(255, 255, 255, 0.08)',
-                        color: '#e5e7eb',
-                        fontSize: '0.75rem',
+                        color: 'var(--text-main)',
+                        fontSize: '0.74rem',
                         fontFamily: 'var(--font-mono)',
                       }}
                     >
@@ -262,20 +238,23 @@ export default function Projects() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '12px',
+                  gap: '10px',
                   paddingTop: '16px',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.06)',
                 }}
               >
                 {project.liveUrl && (
                   <button
                     onClick={() => handleLaunchDemo(project.liveUrl)}
-                    onMouseEnter={() => playSound('hover')}
                     className="btn-cyber-primary interactive"
-                    style={{ flex: 1, padding: '10px 18px', fontSize: '0.88rem' }}
+                    style={{
+                      flex: 1,
+                      padding: '10px 14px',
+                      fontSize: '0.85rem',
+                    }}
                   >
+                    <ExternalLink size={14} />
                     <span>Live Demo</span>
-                    <ArrowUpRight size={16} />
                   </button>
                 )}
 
@@ -284,16 +263,16 @@ export default function Projects() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => playSound('click')}
-                  onMouseEnter={() => playSound('hover')}
+                  title="Source Code"
                   className="btn-cyber-outline interactive"
                   style={{
+                    padding: '10px 14px',
+                    fontSize: '0.85rem',
                     flex: project.liveUrl ? undefined : 1,
-                    padding: '10px 18px',
-                    fontSize: '0.88rem',
                   }}
                 >
-                  <Github size={16} />
-                  <span>Code</span>
+                  <Github size={15} />
+                  {!project.liveUrl && <span>Code Repo</span>}
                 </a>
 
                 <button
@@ -304,7 +283,7 @@ export default function Projects() {
                   title="View Details"
                   className="interactive"
                   style={{
-                    padding: '10px 14px',
+                    padding: '10px 12px',
                     borderRadius: '10px',
                     background: 'rgba(255, 255, 255, 0.04)',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -323,6 +302,7 @@ export default function Projects() {
       {/* Project Details Modal */}
       {selectedProject && (
         <div
+          className="project-modal-backdrop"
           style={{
             position: 'fixed',
             inset: 0,
@@ -330,21 +310,24 @@ export default function Projects() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '24px',
+            padding: '16px',
             backgroundColor: 'rgba(4, 6, 12, 0.85)',
             backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
           }}
           onClick={() => setSelectedProject(null)}
         >
           <div
-            className="glass-panel"
+            className="glass-panel project-modal-panel"
             style={{
               maxWidth: '650px',
               width: '100%',
-              padding: '36px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              padding: '32px',
               borderRadius: '24px',
               position: 'relative',
-              backgroundColor: 'rgba(10, 14, 26, 0.96)',
+              backgroundColor: 'rgba(10, 14, 26, 0.98)',
               border: '1px solid var(--border-glass-hover)',
               boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px var(--primary-glow)',
             }}
@@ -352,10 +335,11 @@ export default function Projects() {
           >
             <button
               onClick={() => setSelectedProject(null)}
+              aria-label="Close Project Details"
               style={{
                 position: 'absolute',
-                top: '20px',
-                right: '20px',
+                top: '16px',
+                right: '16px',
                 background: 'rgba(255, 255, 255, 0.06)',
                 border: 'none',
                 borderRadius: '50%',
@@ -366,48 +350,49 @@ export default function Projects() {
                 justifyContent: 'center',
                 color: '#ffffff',
                 cursor: 'pointer',
+                zIndex: 10,
               }}
             >
               <X size={18} />
             </button>
 
-            <div style={{ marginBottom: '16px' }}>
+            <div style={{ marginBottom: '14px' }}>
               <span className="badge-pill">{selectedProject.category}</span>
             </div>
 
-            <h3 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '6px', paddingRight: '40px' }}>
               {selectedProject.title}
             </h3>
 
-            <p style={{ color: 'var(--primary)', fontFamily: 'var(--font-mono)', fontSize: '0.9rem', marginBottom: '20px' }}>
+            <p style={{ color: 'var(--primary)', fontFamily: 'var(--font-mono)', fontSize: '0.85rem', marginBottom: '18px' }}>
               {selectedProject.tagline}
             </p>
 
-            <p style={{ color: 'var(--text-muted)', lineHeight: 1.8, marginBottom: '24px', fontSize: '0.98rem' }}>
+            <p style={{ color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: '20px', fontSize: '0.94rem' }}>
               {selectedProject.longDescription || selectedProject.description}
             </p>
 
-            <div style={{ marginBottom: '24px' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-dim)', marginBottom: '8px' }}>
+            <div style={{ marginBottom: '22px' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-dim)', marginBottom: '8px' }}>
                 TECH STACK &amp; ARCHITECTURE
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {selectedProject.tags.map((t, idx) => (
-                  <span key={idx} className="badge-pill" style={{ fontSize: '0.78rem' }}>
+                  <span key={idx} className="badge-pill" style={{ fontSize: '0.75rem', padding: '4px 10px' }}>
                     {t}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '14px' }}>
+            <div className="project-modal-actions" style={{ display: 'flex', gap: '12px' }}>
               {selectedProject.liveUrl && (
                 <button
                   onClick={() => handleLaunchDemo(selectedProject.liveUrl)}
                   className="btn-cyber-primary interactive"
                   style={{ flex: 1 }}
                 >
-                  <ExternalLink size={16} />
+                  <ExternalLink size={15} />
                   <span>Launch Live</span>
                 </button>
               )}
@@ -418,13 +403,43 @@ export default function Projects() {
                 className="btn-cyber-outline interactive"
                 style={{ flex: 1 }}
               >
-                <Github size={16} />
+                <Github size={15} />
                 <span>GitHub Repository</span>
               </a>
             </div>
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        @media (max-width: 640px) {
+          .projects-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+          .project-card {
+            padding: 18px 14px !important;
+          }
+          .project-modal-panel {
+            padding: 22px 16px !important;
+            border-radius: 18px !important;
+          }
+          .project-filter-btn {
+            padding: 6px 12px !important;
+            font-size: 0.78rem !important;
+          }
+        }
+        @media (max-width: 440px) {
+          .project-modal-actions {
+            flex-direction: column !important;
+          }
+          .project-modal-actions button,
+          .project-modal-actions a {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

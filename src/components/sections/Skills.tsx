@@ -46,12 +46,13 @@ export default function Skills() {
 
       {/* Category Filter Pills */}
       <div
+        className="skills-filter-pills"
         style={{
           display: 'flex',
           flexWrap: 'wrap',
           justifyContent: 'center',
-          gap: '10px',
-          marginBottom: '48px',
+          gap: '8px',
+          marginBottom: '36px',
         }}
       >
         {categories.map((cat) => {
@@ -64,20 +65,20 @@ export default function Skills() {
                 setActiveCategory(cat);
               }}
               onMouseEnter={() => playSound('hover')}
-              className="interactive"
+              className="interactive skills-filter-btn"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '10px 20px',
-                borderRadius: '12px',
+                gap: '6px',
+                padding: '8px 16px',
+                borderRadius: '10px',
                 fontFamily: 'var(--font-heading)',
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 fontWeight: isActive ? 600 : 500,
                 color: isActive ? '#000000' : '#ffffff',
                 backgroundColor: isActive ? 'var(--primary)' : 'rgba(255, 255, 255, 0.04)',
                 border: `1px solid ${isActive ? 'var(--primary)' : 'rgba(255, 255, 255, 0.1)'}`,
-                boxShadow: isActive ? '0 0 20px var(--primary-glow)' : 'none',
+                boxShadow: isActive ? '0 0 16px var(--primary-glow)' : 'none',
                 cursor: 'pointer',
                 transition: 'var(--transition-smooth)',
               }}
@@ -90,10 +91,11 @@ export default function Skills() {
 
       {/* Skills Grid */}
       <div
+        className="skills-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '20px',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+          gap: '16px',
         }}
       >
         {filteredSkills.map((skill) => {
@@ -101,12 +103,12 @@ export default function Skills() {
           return (
             <Card3DTilt key={skill.id} maxTilt={8}>
               <div
-                className="glass-card"
+                className="glass-card skill-card"
                 style={{
-                  padding: '22px',
+                  padding: '20px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '14px',
+                  gap: '12px',
                 }}
               >
                 <div
@@ -132,7 +134,7 @@ export default function Skills() {
                     >
                       <IconComp size={16} />
                     </div>
-                    <span style={{ fontWeight: 600, fontSize: '1rem', color: '#ffffff' }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.95rem', color: '#ffffff' }}>
                       {skill.name}
                     </span>
                   </div>
@@ -140,7 +142,7 @@ export default function Skills() {
                   <span
                     style={{
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '0.82rem',
+                      fontSize: '0.80rem',
                       color: 'var(--primary)',
                       fontWeight: 600,
                     }}
@@ -178,14 +180,14 @@ export default function Skills() {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     fontFamily: 'var(--font-mono)',
-                    fontSize: '0.74rem',
+                    fontSize: '0.72rem',
                     color: 'var(--text-dim)',
                   }}
                 >
                   <span>{skill.category}</span>
                   {skill.featured && (
                     <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                      <Sparkles size={12} /> Featured
+                      <Sparkles size={11} /> Featured
                     </span>
                   )}
                 </div>
@@ -194,6 +196,23 @@ export default function Skills() {
           );
         })}
       </div>
+
+      <style jsx>{`
+        @media (max-width: 640px) {
+          .skills-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+          .skill-card {
+            padding: 16px 14px !important;
+          }
+          .skills-filter-btn {
+            padding: 6px 12px !important;
+            font-size: 0.78rem !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
+

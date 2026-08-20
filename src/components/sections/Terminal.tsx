@@ -218,56 +218,60 @@ export default function Terminal() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '12px 20px',
+            padding: '10px 16px',
             background: 'rgba(255, 255, 255, 0.04)',
             borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444' }} />
-            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#f59e0b' }} />
-            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#10b981' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
+            <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
+            <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} />
           </div>
 
           <div
             style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.8rem',
+              fontSize: '0.78rem',
               color: 'var(--text-muted)',
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
           >
-            <TerminalIcon size={14} style={{ color: 'var(--primary)' }} />
-            <span>rupesh@cdlsiet-engine:~ (zsh)</span>
+            <TerminalIcon size={13} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+            <span className="terminal-title-text">rupesh@cdlsiet-engine:~ (zsh)</span>
           </div>
 
-          <div style={{ width: '50px' }} />
+          <div style={{ width: '30px' }} />
         </div>
 
         {/* Output Buffer */}
         <div
+          className="terminal-buffer"
           style={{
-            padding: '24px',
-            minHeight: '320px',
-            maxHeight: '440px',
+            padding: '20px',
+            minHeight: '280px',
+            maxHeight: '400px',
             overflowY: 'auto',
             fontFamily: 'var(--font-mono)',
-            fontSize: '0.9rem',
+            fontSize: '0.85rem',
             lineHeight: 1.6,
             background: 'rgba(5, 7, 14, 0.95)',
           }}
         >
           {history.map((entry, idx) => (
-            <div key={idx} style={{ marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', marginBottom: '4px' }}>
+            <div key={idx} style={{ marginBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--primary)', marginBottom: '4px', flexWrap: 'wrap' }}>
                 <span style={{ color: '#10b981' }}>rupesh@portfolio</span>
                 <span style={{ color: 'var(--text-dim)' }}>:~$</span>
                 <span style={{ color: '#ffffff', fontWeight: 600 }}>{entry.command}</span>
-                <span style={{ marginLeft: 'auto', color: 'var(--text-dim)', fontSize: '0.75rem' }}>{entry.time}</span>
+                <span style={{ marginLeft: 'auto', color: 'var(--text-dim)', fontSize: '0.72rem' }}>{entry.time}</span>
               </div>
-              <div style={{ color: 'var(--text-muted)', paddingLeft: '14px' }}>{entry.output}</div>
+              <div style={{ color: 'var(--text-muted)', paddingLeft: '10px', wordBreak: 'break-word' }}>{entry.output}</div>
             </div>
           ))}
           <div ref={bottomRef} />
@@ -281,36 +285,39 @@ export default function Terminal() {
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              gap: '6px',
               color: 'var(--primary)',
-              marginTop: '12px',
+              marginTop: '10px',
             }}
           >
-            <span style={{ color: '#10b981' }}>rupesh@portfolio</span>
-            <span style={{ color: 'var(--text-dim)' }}>:~$</span>
+            <span className="terminal-prompt-full" style={{ color: '#10b981', flexShrink: 0 }}>rupesh@portfolio</span>
+            <span style={{ color: 'var(--text-dim)', flexShrink: 0 }}>:~$</span>
             <input
               ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="type 'help', 'education', 'socials', 'theme purple'..."
+              placeholder="type 'help', 'skills', 'theme purple'..."
               style={{
                 flex: 1,
+                minWidth: 0,
                 background: 'transparent',
                 border: 'none',
                 outline: 'none',
                 color: '#ffffff',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
               }}
             />
             <button
               type="submit"
+              aria-label="Submit command"
               style={{
                 background: 'transparent',
                 border: 'none',
                 color: 'var(--primary)',
                 cursor: 'pointer',
+                flexShrink: 0,
               }}
             >
               <CornerDownLeft size={16} />
@@ -321,17 +328,17 @@ export default function Terminal() {
         {/* Quick Command Chips */}
         <div
           style={{
-            padding: '12px 20px',
+            padding: '10px 16px',
             background: 'rgba(255, 255, 255, 0.02)',
             borderTop: '1px solid rgba(255, 255, 255, 0.06)',
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'center',
-            gap: '8px',
+            gap: '6px',
           }}
         >
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--text-dim)' }}>
-            QUICK RUN:
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--text-dim)' }}>
+            QUICK:
           </span>
           {['help', 'education', 'skills', 'projects', 'socials', 'theme purple', 'clear'].map((cmd) => (
             <button
@@ -341,8 +348,8 @@ export default function Terminal() {
               className="interactive"
               style={{
                 fontFamily: 'var(--font-mono)',
-                fontSize: '0.75rem',
-                padding: '4px 10px',
+                fontSize: '0.72rem',
+                padding: '3px 8px',
                 borderRadius: '6px',
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -355,6 +362,22 @@ export default function Terminal() {
           ))}
         </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 640px) {
+          .terminal-buffer {
+            padding: 14px 10px !important;
+            font-size: 0.80rem !important;
+          }
+          .terminal-prompt-full {
+            display: none !important;
+          }
+          .terminal-title-text {
+            font-size: 0.72rem !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
+

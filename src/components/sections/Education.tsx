@@ -48,9 +48,9 @@ export default function Education() {
           return (
             <Card3DTilt key={item.id} maxTilt={6}>
               <div
-                className="glass-panel"
+                className="glass-panel edu-card"
                 style={{
-                  padding: '36px',
+                  padding: '32px',
                   position: 'relative',
                   borderLeft: `4px solid ${
                     index === 0 ? 'var(--primary)' : index === 1 ? 'var(--secondary)' : '#10b981'
@@ -64,8 +64,8 @@ export default function Education() {
                     flexWrap: 'wrap',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    gap: '12px',
-                    marginBottom: '16px',
+                    gap: '10px',
+                    marginBottom: '14px',
                   }}
                 >
                   <div
@@ -74,15 +74,15 @@ export default function Education() {
                       alignItems: 'center',
                       gap: '8px',
                       fontFamily: 'var(--font-mono)',
-                      fontSize: '0.82rem',
+                      fontSize: '0.80rem',
                       color: index === 0 ? 'var(--primary)' : index === 1 ? 'var(--secondary)' : '#10b981',
                       background: 'rgba(255, 255, 255, 0.04)',
-                      padding: '4px 12px',
+                      padding: '4px 10px',
                       borderRadius: '8px',
                       border: '1px solid rgba(255, 255, 255, 0.08)',
                     }}
                   >
-                    <IconComp size={16} />
+                    <IconComp size={15} />
                     <span>MILESTONE #{data.education.length - index}</span>
                   </div>
 
@@ -92,7 +92,7 @@ export default function Education() {
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px',
-                        fontSize: '0.82rem',
+                        fontSize: '0.80rem',
                         fontFamily: 'var(--font-mono)',
                         color: '#ffffff',
                         background: 'rgba(16, 185, 129, 0.15)',
@@ -109,11 +109,13 @@ export default function Education() {
 
                 {/* Degree Title */}
                 <h3
+                  className="edu-degree-title"
                   style={{
-                    fontSize: '1.45rem',
+                    fontSize: '1.35rem',
                     fontWeight: 700,
                     marginBottom: '8px',
                     color: '#ffffff',
+                    lineHeight: 1.3,
                   }}
                 >
                   {item.degree}
@@ -125,21 +127,21 @@ export default function Education() {
                     display: 'flex',
                     flexWrap: 'wrap',
                     alignItems: 'center',
-                    gap: '16px',
-                    marginBottom: '18px',
+                    gap: '12px',
+                    marginBottom: '16px',
                     color: 'var(--text-muted)',
-                    fontSize: '0.95rem',
+                    fontSize: '0.92rem',
                   }}
                 >
                   <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{item.institution}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-dim)' }}>
-                    <MapPin size={14} style={{ color: 'var(--primary)' }} />
+                    <MapPin size={13} style={{ color: 'var(--primary)' }} />
                     <span>{item.location}</span>
                   </div>
                 </div>
 
                 {/* Description */}
-                <p style={{ color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: '20px', fontSize: '0.96rem' }}>
+                <p style={{ color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: '18px', fontSize: '0.94rem' }}>
                   {item.description}
                 </p>
 
@@ -149,32 +151,32 @@ export default function Education() {
                     <div
                       style={{
                         fontFamily: 'var(--font-mono)',
-                        fontSize: '0.78rem',
+                        fontSize: '0.75rem',
                         color: 'var(--text-dim)',
-                        marginBottom: '10px',
+                        marginBottom: '8px',
                         letterSpacing: '0.05em',
                       }}
                     >
                       KEY FOCUS AREAS:
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                       {item.highlights.map((hl, hIdx) => (
                         <div
                           key={hIdx}
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '6px',
-                            padding: '4px 12px',
+                            gap: '5px',
+                            padding: '4px 10px',
                             borderRadius: '999px',
                             background: 'rgba(255, 255, 255, 0.03)',
                             border: '1px solid rgba(255, 255, 255, 0.08)',
                             color: '#e5e7eb',
-                            fontSize: '0.82rem',
+                            fontSize: '0.78rem',
                             fontFamily: 'var(--font-mono)',
                           }}
                         >
-                          <CheckCircle size={12} style={{ color: 'var(--primary)' }} />
+                          <CheckCircle size={11} style={{ color: 'var(--primary)' }} />
                           <span>{hl}</span>
                         </div>
                       ))}
@@ -186,6 +188,18 @@ export default function Education() {
           );
         })}
       </div>
+
+      <style jsx>{`
+        @media (max-width: 640px) {
+          .edu-card {
+            padding: 20px 16px !important;
+          }
+          .edu-degree-title {
+            font-size: 1.15rem !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
+

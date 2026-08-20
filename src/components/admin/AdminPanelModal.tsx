@@ -1018,7 +1018,14 @@ export default function AdminPanelModal() {
             grid-template-columns: 1fr !important;
           }
         }
+        @media (max-width: 640px) {
+          .admin-input {
+            padding: 8px 12px !important;
+            font-size: 0.85rem !important;
+          }
+        }
       `}</style>
     </div>
   );
 }
+

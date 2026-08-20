@@ -1,6 +1,0 @@
-User-Agent: *
-Allow: /
-Disallow: /api/
-
-Host: https://rupesh-portfolio.vercel.app
-Sitemap: https://rupesh-portfolio.vercel.app/sitemap.xml
