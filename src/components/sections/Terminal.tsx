@@ -36,11 +36,18 @@ export default function Terminal() {
     },
   ]);
 
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const bufferRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (bufferRef.current) {
+      bufferRef.current.scrollTop = bufferRef.current.scrollHeight;
+    }
   }, [history]);
 
   const getTimeString = () => {
@@ -251,6 +258,7 @@ export default function Terminal() {
 
         {/* Output Buffer */}
         <div
+          ref={bufferRef}
           className="terminal-buffer"
           style={{
             padding: '20px',
@@ -274,7 +282,7 @@ export default function Terminal() {
               <div style={{ color: 'var(--text-muted)', paddingLeft: '10px', wordBreak: 'break-word' }}>{entry.output}</div>
             </div>
           ))}
-          <div ref={bottomRef} />
+
 
           {/* Active Input Line */}
           <form
