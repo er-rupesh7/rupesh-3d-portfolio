@@ -52,7 +52,15 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved);
+        const parsed = JSON.parse(saved) as PortfolioData;
+
+        // Migrate the retired Aetheria card without discarding any other
+        // portfolio customizations already saved through the admin panel.
+        parsed.projects = parsed.projects.map((project) =>
+          project.id === 'proj-1' && project.title.toLowerCase().includes('aetheria')
+            ? initialPortfolioData.projects[0]
+            : project
+        );
         setData(parsed);
       }
     } catch (e) {

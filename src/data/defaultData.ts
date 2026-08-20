@@ -26,7 +26,7 @@ export interface ProjectItem {
   description: string;
   longDescription?: string;
   tags: string[];
-  category: 'Full-Stack' | '3D & WebGL' | 'Cloud & Systems' | 'AI & Tools';
+  category: 'Frontend' | 'Full-Stack' | '3D & WebGL' | 'Cloud & Systems' | 'AI & Tools';
   githubUrl: string;
   liveUrl?: string;
   featured: boolean;
@@ -181,18 +181,17 @@ export const initialPortfolioData: PortfolioData = {
   projects: [
     {
       id: 'proj-1',
-      title: 'Aetheria 3D — Next-Gen Web Universe',
-      tagline: 'Interactive 3D WebGL Virtual World with Real-Time Physics',
-      description: 'An immersive 3D digital ecosystem featuring customizable spatial audio, dynamic Three.js lighting, procedural terrain shaders, and fluid 60fps WebGL particle simulations.',
-      longDescription: 'Engineered with Next.js, Three.js, and GLSL shaders. Features real-time spatial positioning, interactive orbital cameras, physics collisions, and dynamic LOD rendering for extreme performance on mobile and desktop.',
-      tags: ['Next.js', 'Three.js', 'WebGL', 'GLSL', 'Web Audio API'],
-      category: '3D & WebGL',
-      githubUrl: 'https://github.com/er-rupesh7/aetheria-3d-universe',
-      liveUrl: 'https://aetheria-3d-universe.vercel.app',
+      title: 'Tic Tac Toe',
+      tagline: 'A Clean, Responsive Take on the Classic Strategy Game',
+      description: 'A polished browser-based Tic Tac Toe experience with quick, intuitive gameplay and a responsive interface that works across desktop and mobile devices.',
+      longDescription: 'Built around clear game-state logic, win and draw detection, turn-by-turn feedback, and instant replayability. The focused interface keeps every match fast, accessible, and easy to enjoy on any screen size.',
+      tags: ['Game Logic', 'Responsive UI', 'Web Game', 'Vercel'],
+      category: 'Frontend',
+      githubUrl: 'https://github.com/er-rupesh7/tictactoe',
+      liveUrl: 'https://tictactoe-rk.vercel.app',
       featured: true,
-      metrics: '60 FPS Ultra Performance',
-      starsCount: 142,
-      imageGradient: 'linear-gradient(135deg, #0ea5e9, #6366f1, #a855f7)',
+      metrics: 'Classic 3×3 Gameplay',
+      imageGradient: 'linear-gradient(135deg, #06b6d4, #2563eb, #7c3aed)',
     },
     {
       id: 'proj-2',

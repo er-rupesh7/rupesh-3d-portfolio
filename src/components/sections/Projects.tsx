@@ -22,7 +22,7 @@ export default function Projects() {
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
 
-  const categories = ['All', 'Full-Stack', '3D & WebGL', 'Cloud & Systems', 'AI & Tools'];
+  const categories = ['All', 'Frontend', 'Full-Stack', '3D & WebGL', 'Cloud & Systems', 'AI & Tools'];
 
   const filteredProjects =
     activeCategory === 'All'
