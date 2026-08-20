@@ -17,11 +17,17 @@ import {
   MessageSquare,
   PhoneCall,
   ExternalLink,
+  MessageCircle,
+  CheckCircle2,
+  AlertCircle,
+  ShieldCheck,
 } from 'lucide-react';
 
 export default function Contact() {
   const { data, playSound, showToast } = usePortfolio();
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [statusMessage, setStatusMessage] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
@@ -42,7 +48,20 @@ export default function Contact() {
     setTimeout(() => setCopiedPhone(false), 2500);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleWhatsAppSend = () => {
+    const name = formData.name.trim() || 'Visitor';
+    const message = formData.message.trim() || 'Hello Rupesh, I would like to connect with you regarding an opportunity.';
+    const email = formData.email.trim() ? ` (Email: ${formData.email.trim()})` : '';
+    const text = `Hi Rupesh, my name is ${name}.${email}\n\n${message}`;
+
+    const cleanPhone = data.personal.phone.replace(/[^0-9]/g, '');
+    const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+
+    playSound('click');
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) {
       showToast('Please fill in all required fields');
@@ -50,29 +69,97 @@ export default function Contact() {
     }
 
     setIsSubmitting(true);
+    setSubmitStatus('idle');
     playSound('click');
 
-    const subject = encodeURIComponent(formData.subject || `Portfolio Inquiry from ${formData.name}`);
-    const body = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}\n\nSent from Rupesh Kumar 3D Portfolio`
-    );
-    const mailtoUrl = `mailto:${data.personal.email}?subject=${subject}&body=${body}`;
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      playSound('success');
-      confetti({
-        particleCount: 100,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ['#00f0ff', '#7000ff', '#ff007b', '#10b981'],
+    try {
+      // Step 1: Pre-flight Rate Limit Check (5-day limit by IP & Email)
+      const checkRes = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check', email: formData.email }),
       });
-      showToast('Opening mail client to send payload to ' + data.personal.email);
-      // Trigger native email client or webmail
-      window.location.href = mailtoUrl;
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    }, 800);
+
+      const checkData = await checkRes.json();
+
+      if (checkData.isRateLimited) {
+        setIsSubmitting(false);
+        setSubmitStatus('error');
+        setStatusMessage(checkData.message);
+        showToast(`Limit Active: Wait ${checkData.remainingTime}`);
+        return;
+      }
+
+      // Step 2: Client-side Direct Submission to Web3Forms
+      const accessKey =
+        process.env.NEXT_PUBLIC_WEB3FORMS_KEY ||
+        process.env.WEB3FORMS_ACCESS_KEY ||
+        'b09c40d2-bfa0-4b81-ac04-5476576be605';
+
+      const formPayload = new FormData();
+      formPayload.append('access_key', accessKey);
+      formPayload.append('name', formData.name.trim());
+      formPayload.append('email', formData.email.trim());
+      formPayload.append('subject', formData.subject?.trim() || `Portfolio Inquiry from ${formData.name.trim()}`);
+      formPayload.append('message', formData.message.trim());
+      formPayload.append('from_name', 'Rupesh Kumar 3D Portfolio');
+      formPayload.append('botcheck', '');
+
+      const web3Res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formPayload,
+      });
+
+      const web3Data = await web3Res.json();
+
+      if (web3Data.success) {
+        // Step 3: Record the successful transmission in the rate limit registry
+        try {
+          await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'record',
+              email: formData.email,
+              name: formData.name,
+            }),
+          });
+        } catch {
+          // ignore recording error if network blips
+        }
+
+        setIsSubmitting(false);
+        setSubmitStatus('success');
+        setStatusMessage('Your transmission has been delivered directly to Rupesh!');
+        playSound('success');
+        confetti({
+          particleCount: 100,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#00f0ff', '#7000ff', '#ff007b', '#10b981'],
+        });
+        showToast('Transmission delivered to ' + data.personal.email);
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        setIsSubmitting(false);
+        setSubmitStatus('error');
+        setStatusMessage(
+          web3Data.message ||
+            'Email gateway encountered an issue. You can message Rupesh directly via WhatsApp below.'
+        );
+        showToast(web3Data.message || 'Failed to dispatch message.');
+      }
+    } catch (err: any) {
+      setIsSubmitting(false);
+      setSubmitStatus('error');
+      setStatusMessage('Network error dispatching message. You can message Rupesh directly via WhatsApp below.');
+      showToast('Could not reach transmission server.');
+    }
   };
+
+
+
+
 
   return (
     <section id="contact" className="section-wrapper">
@@ -518,25 +605,129 @@ export default function Contact() {
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              onMouseEnter={() => playSound('hover')}
-              className="btn-cyber-primary interactive"
-              style={{ width: '100%', marginTop: '8px' }}
-            >
-              {isSubmitting ? (
-                <span>Dispatching Payload...</span>
-              ) : (
-                <>
-                  <span>Send Message Directly</span>
-                  <Send size={16} />
-                </>
-              )}
-            </button>
+            {/* Status Feedback Notification */}
+            {submitStatus === 'success' && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  border: '1px solid #10b981',
+                  color: '#10b981',
+                  fontSize: '0.88rem',
+                  fontFamily: 'var(--font-mono)',
+                  maxWidth: '100%',
+                  wordBreak: 'break-word',
+                  overflowWrap: 'anywhere',
+                }}
+              >
+                <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
+                <span>{statusMessage}</span>
+              </div>
+            )}
+
+            {submitStatus === 'error' && (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  color: '#ef4444',
+                  fontSize: '0.85rem',
+                  fontFamily: 'var(--font-mono)',
+                  maxWidth: '100%',
+                  wordBreak: 'break-word',
+                  overflowWrap: 'anywhere',
+                  overflow: 'hidden',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <span style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{statusMessage}</span>
+                </div>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+                  Tip: You can also message Rupesh directly using the green WhatsApp button below.
+                </div>
+              </div>
+            )}
+
+
+            {/* Dual Action Dispatch Buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                onMouseEnter={() => playSound('hover')}
+                className="btn-cyber-primary interactive"
+                style={{ width: '100%' }}
+              >
+                {isSubmitting ? (
+                  <span>Dispatching Transmission...</span>
+                ) : (
+                  <>
+                    <span>Send Message to Email</span>
+                    <Send size={16} />
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleWhatsAppSend}
+                onMouseEnter={() => playSound('hover')}
+                className="interactive"
+                style={{
+                  width: '100%',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '12px 20px',
+                  borderRadius: '12px',
+                  background: 'rgba(37, 211, 102, 0.15)',
+                  border: '1px solid #25d366',
+                  color: '#25d366',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '0.92rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'var(--transition-smooth)',
+                }}
+              >
+                <MessageCircle size={18} />
+                <span>Send via WhatsApp (+91 94663 27537)</span>
+              </button>
+
+              {/* Rate Limit Security Protocol Badge */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  marginTop: '4px',
+                  color: 'var(--text-dim)',
+                  fontSize: '0.74rem',
+                  fontFamily: 'var(--font-mono)',
+                  textAlign: 'center',
+                }}
+              >
+                <ShieldCheck size={13} style={{ color: 'var(--primary)' }} />
+                <span>Security Protocol: Limit 1 transmission per person/IP every 5 days</span>
+              </div>
+            </div>
           </form>
         </div>
       </div>
+
+
 
       <style jsx>{`
         @media (max-width: 900px) {
