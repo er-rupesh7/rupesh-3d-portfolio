@@ -48,7 +48,8 @@ export default function HeroScene() {
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const isCompactDevice = window.innerWidth <= 900;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isCompactDevice ? 1.25 : 1.75));
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
@@ -136,7 +137,10 @@ export default function HeroScene() {
     scene.add(coreGroup);
 
     // 2. Cosmic Nebula Particle Field
-    const particleCount = data.themeConfig.particlesCount || 2000;
+    const configuredParticleCount = data.themeConfig.particlesCount || 2000;
+    const particleCount = isCompactDevice
+      ? Math.min(configuredParticleCount, 1100)
+      : Math.min(configuredParticleCount, 2200);
     const particlesGeom = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const particleColors = new Float32Array(particleCount * 3);
@@ -194,7 +198,7 @@ export default function HeroScene() {
       targetMouseY = (e.clientY - windowHalfY) * 0.0012;
     };
 
-    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
 
     // Resize Handler
     const onResize = () => {
@@ -216,11 +220,19 @@ export default function HeroScene() {
 
     // Animation Loop
     let animationFrameId: number;
-    let clock = new THREE.Clock();
+    const clock = new THREE.Clock();
+    let elapsedTime = 0;
+    let pageVisible = !document.hidden;
+    const onVisibilityChange = () => {
+      pageVisible = !document.hidden;
+      if (pageVisible) clock.getDelta();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      if (!pageVisible) return;
+      elapsedTime += Math.min(clock.getDelta(), 0.05);
 
       // Smooth Mouse Lerp
       mouseX += (targetMouseX - mouseX) * 0.05;
@@ -253,6 +265,7 @@ export default function HeroScene() {
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       cancelAnimationFrame(animationFrameId);
       renderer.dispose();
       icosaGeometry.dispose();

@@ -393,7 +393,7 @@ export default function Hero() {
               >
                 <div>
                   <div className="hud-stat-label" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>
-                    LEETCODE SOLVED
+                    DSA SOLVED
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#f59e0b', marginTop: '4px' }}>
                     {leetcodeProfile ? leetcodeProfile.solved.toLocaleString() : data.stats.problemSolved}
