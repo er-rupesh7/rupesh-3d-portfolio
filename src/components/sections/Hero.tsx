@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePortfolio } from '@/context/PortfolioContext';
-import HeroScene from '@/components/3d/HeroScene';
 import {
   ArrowRight,
   Terminal as TerminalIcon,
@@ -58,9 +57,6 @@ export default function Hero() {
         overflow: 'hidden',
       }}
     >
-      {/* 3D WebGL Background Scene */}
-      <HeroScene />
-
       <div
         style={{
           position: 'relative',
@@ -411,4 +407,3 @@ export default function Hero() {
     </section>
   );
 }
-

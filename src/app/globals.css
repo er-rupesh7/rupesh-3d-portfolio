@@ -96,6 +96,38 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Fixed scene layer: the document scrolls above one persistent 3D world. */
+.portfolio-shell {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  isolation: isolate;
+}
+
+.fixed-3d-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fixed-3d-background::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(4, 5, 8, 0.12), rgba(4, 5, 8, 0.42)),
+    radial-gradient(circle at center, transparent 20%, rgba(4, 5, 8, 0.38) 100%);
+  pointer-events: none;
+}
+
+.portfolio-content,
+.portfolio-shell > footer {
+  position: relative;
+  z-index: 2;
+}
+
 /* Background Ambient Orbs */
 body::before {
   content: '';
@@ -167,26 +199,72 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Glassmorphic Container */
 .glass-panel {
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-glass);
+  position: relative;
+  background:
+    radial-gradient(120% 85% at 10% 0%, rgba(255, 255, 255, 0.14), transparent 48%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.115), rgba(255, 255, 255, 0.03) 48%, rgba(0, 0, 0, 0.16)),
+    rgba(8, 12, 22, 0.62);
+  backdrop-filter: blur(28px) saturate(165%);
+  -webkit-backdrop-filter: blur(28px) saturate(165%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.34),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.42),
+    inset 1.5px 0 1px rgba(160, 235, 255, 0.18),
+    inset -1px 0 1px rgba(121, 40, 202, 0.14),
+    inset 0 -2px 2px rgba(0, 0, 0, 0.28);
   transition: var(--transition-smooth);
+}
+
+/* A rounded optical rim makes the backdrop appear to bend at the glass edge. */
+.glass-panel::after,
+.glass-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  padding: 1.5px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from 205deg at 50% 50%,
+    rgba(112, 220, 255, 0.1),
+    rgba(255, 255, 255, 0.72) 12%,
+    rgba(255, 255, 255, 0.08) 31%,
+    rgba(150, 105, 255, 0.28) 52%,
+    rgba(255, 255, 255, 0.06) 72%,
+    rgba(86, 225, 255, 0.5) 90%,
+    rgba(112, 220, 255, 0.1)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  filter: drop-shadow(0 0 3px rgba(140, 225, 255, 0.18));
+  opacity: 0.82;
 }
 
 .glass-panel:hover {
   border-color: var(--border-glass-hover);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 25px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.42), 0 0 25px var(--primary-glow), inset 0 1px 0 rgba(255, 255, 255, 0.32);
 }
 
 .glass-card {
-  background: var(--bg-card);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--border-glass);
+  position: relative;
+  background:
+    radial-gradient(110% 80% at 8% 0%, rgba(255, 255, 255, 0.11), transparent 48%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.02)),
+    rgba(10, 15, 27, 0.55);
+  backdrop-filter: blur(22px) saturate(155%);
+  -webkit-backdrop-filter: blur(22px) saturate(155%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 16px;
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.32),
+    inset 1px 0 1px rgba(130, 225, 255, 0.12),
+    inset -1px 0 1px rgba(150, 100, 255, 0.1),
+    inset 0 -1.5px 1px rgba(0, 0, 0, 0.22),
+    0 12px 32px rgba(0, 0, 0, 0.22);
   transition: var(--transition-smooth);
 }
 
@@ -342,11 +420,10 @@ h1, h2, h3, h4, h5, h6 {
 /* 3D Canvas Container */
 .hero-canvas-container {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 1;
+  z-index: 0;
   pointer-events: none;
 }
 
@@ -402,6 +479,13 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .glass-panel,
+  .glass-card {
+    transition: none;
+  }
+}
+
 @media (max-width: 380px) {
   .section-wrapper {
     padding: 50px 10px;
@@ -423,4 +507,3 @@ h1, h2, h3, h4, h5, h6 {
     transform: none;
   }
 }
-

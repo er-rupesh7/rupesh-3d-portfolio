@@ -8,12 +8,16 @@ import Skills from '@/components/sections/Skills';
 import Projects from '@/components/sections/Projects';
 import Terminal from '@/components/sections/Terminal';
 import Contact from '@/components/sections/Contact';
+import HeroScene from '@/components/3d/HeroScene';
 
 export default function Home() {
   return (
-    <div style={{ position: 'relative', overflowX: 'hidden' }}>
+    <div className="portfolio-shell">
+      <div className="fixed-3d-background">
+        <HeroScene />
+      </div>
       <Navbar />
-      <main id="main-content">
+      <main id="main-content" className="portfolio-content">
         <Hero />
         <About />
         <Education />
