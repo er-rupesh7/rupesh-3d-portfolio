@@ -235,8 +235,10 @@ export default function Projects() {
 
               {/* Action Buttons */}
               <div
+                className="project-card-actions"
                 style={{
-                  display: 'flex',
+                  display: 'grid',
+                  gridTemplateColumns: project.liveUrl ? 'minmax(0, 1fr) auto auto' : 'minmax(0, 1fr) auto',
                   alignItems: 'center',
                   gap: '10px',
                   paddingTop: '16px',
@@ -246,7 +248,7 @@ export default function Projects() {
                 {project.liveUrl && (
                   <button
                     onClick={() => handleLaunchDemo(project.liveUrl)}
-                    className="btn-cyber-primary interactive"
+                    className="btn-cyber-primary interactive project-live-button"
                     style={{
                       flex: 1,
                       padding: '10px 14px',
@@ -264,7 +266,8 @@ export default function Projects() {
                   rel="noopener noreferrer"
                   onClick={() => playSound('click')}
                   title="Source Code"
-                  className="btn-cyber-outline interactive"
+                  aria-label={`View ${project.title} source code on GitHub`}
+                  className="btn-cyber-outline interactive project-source-button"
                   style={{
                     padding: '10px 14px',
                     fontSize: '0.85rem',
@@ -272,7 +275,7 @@ export default function Projects() {
                   }}
                 >
                   <Github size={15} />
-                  {!project.liveUrl && <span>Code Repo</span>}
+                  <span>{project.liveUrl ? 'GitHub' : 'Code Repo'}</span>
                 </a>
 
                 <button
@@ -281,7 +284,8 @@ export default function Projects() {
                     setSelectedProject(project);
                   }}
                   title="View Details"
-                  className="interactive"
+                  aria-label={`View details for ${project.title}`}
+                  className="interactive project-details-button"
                   style={{
                     padding: '10px 12px',
                     borderRadius: '10px',
@@ -289,9 +293,16 @@ export default function Projects() {
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     color: '#ffffff',
                     cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '7px',
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 600,
                   }}
                 >
                   <Code2 size={16} />
+                  <span>Details</span>
                 </button>
               </div>
             </div>
@@ -428,8 +439,29 @@ export default function Projects() {
             padding: 6px 12px !important;
             font-size: 0.78rem !important;
           }
+          .project-card-actions {
+            grid-template-columns: minmax(0, 1fr) auto auto !important;
+          }
+          .project-card-actions > * {
+            min-width: 0;
+            min-height: 46px;
+            padding: 10px 12px !important;
+            white-space: nowrap;
+          }
         }
         @media (max-width: 440px) {
+          .project-card-actions {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+          .project-live-button {
+            grid-column: 1 / -1;
+            width: 100% !important;
+          }
+          .project-source-button,
+          .project-details-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
           .project-modal-actions {
             flex-direction: column !important;
           }
