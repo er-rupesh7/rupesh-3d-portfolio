@@ -1,13 +1,38 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { usePortfolio } from '@/context/PortfolioContext';
+
+interface LeetCodeOrbitData {
+  avatarUrl: string | null;
+  difficulty: { easy: number; medium: number; hard: number };
+  recentAccepted: Array<{ title: string; url: string }>;
+}
 
 export default function HeroScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { data } = usePortfolio();
   const theme = data.themeConfig.primaryTheme;
+  const [leetcode, setLeetcode] = useState<LeetCodeOrbitData | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const loadLeetCode = async () => {
+      try {
+        const response = await fetch('/api/leetcode');
+        if (response.ok && active) setLeetcode(await response.json());
+      } catch {
+        // The existing Three.js core remains available as a visual fallback.
+      }
+    };
+    loadLeetCode();
+    const timer = window.setInterval(loadLeetCode, 30 * 60 * 1000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current || typeof window === 'undefined') return;
@@ -246,12 +271,213 @@ export default function HeroScene() {
     };
   }, [theme, data.themeConfig.particlesCount]);
 
+  const difficultyStats = leetcode
+    ? [
+        { label: 'EASY', value: leetcode.difficulty.easy, tone: 'easy' },
+        { label: 'MEDIUM', value: leetcode.difficulty.medium, tone: 'medium' },
+        { label: 'HARD', value: leetcode.difficulty.hard, tone: 'hard' },
+      ]
+    : [];
+
   return (
-    <div
-      ref={containerRef}
-      className="hero-canvas-container"
-      aria-hidden="true"
-      style={{ pointerEvents: 'none' }}
-    />
+    <>
+      <div
+        ref={containerRef}
+        className="hero-canvas-container"
+        aria-hidden="true"
+        style={{ pointerEvents: 'none' }}
+      />
+      {leetcode && (
+        <div className="leetcode-space" aria-hidden="true">
+          <div className="neon-orbit orbit-one" />
+          <div className="space-avatar">
+            {leetcode.avatarUrl ? <img src="/api/leetcode?avatar=1" alt="" /> : <span>3R</span>}
+          </div>
+
+          {difficultyStats.map((stat, index) => (
+            <div
+              key={stat.label}
+              className={`space-orbiter difficulty-orbiter ${stat.tone}`}
+              style={{ animationDelay: `${index * -7}s` }}
+            >
+              <span><b>{stat.value}</b>{stat.label}</span>
+            </div>
+          ))}
+
+          {leetcode.recentAccepted.slice(0, 20).map((problem, index) => {
+            // Keep all 20 paths distinct: 28px is four times the previous 7px gap.
+            const radius = 652 - index * 28;
+            const planeRatios = [0.3, 0.44, 0.6, 0.74, 0.38];
+            const planeAngles = [-34, 18, 56, -9, 37];
+            const planeRatio = planeRatios[index % planeRatios.length];
+            const planeAngle = planeAngles[index % planeAngles.length];
+            const orbitStyle = {
+              '--question-orbit-radius': `${radius}px`,
+              '--question-orbit-y': `${radius * planeRatio}px`,
+              '--question-orbit-angle': `${planeAngle}deg`,
+              '--question-orbit-duration': `${58 - index * 2.25}s`,
+              '--question-orbit-delay': `${index * -3.15}s`,
+            } as React.CSSProperties;
+
+            return (
+              <React.Fragment key={`${problem.title}-${index}`}>
+                <div
+                  className={`question-orbit-ring ring-${index % 3}`}
+                  style={{
+                    width: radius * 2,
+                    height: radius * 2 * planeRatio,
+                    transform: `translate(-50%, -50%) rotate(${planeAngle}deg)`,
+                  }}
+                />
+                <div className="space-orbiter problem-orbiter" style={orbitStyle}>
+                  <span>{problem.title}</span>
+                </div>
+              </React.Fragment>
+            );
+          })}
+        </div>
+      )}
+
+      <style jsx>{`
+        .leetcode-space {
+          position: absolute;
+          left: calc(50% + 12vw);
+          top: 50%;
+          width: 420px;
+          height: 420px;
+          transform: translate(-50%, -50%);
+          pointer-events: none;
+          perspective: 900px;
+          filter: saturate(1.15);
+        }
+        .space-avatar {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          z-index: 5;
+          width: 184px;
+          height: 184px;
+          padding: 4px;
+          transform: translate(-50%, -50%);
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          background: conic-gradient(from 30deg, #00f0ff, #8b5cf6, #ffbf3f, #00f0ff);
+          box-shadow: 0 0 22px var(--primary), 0 0 60px var(--primary-glow), inset 0 0 14px #fff;
+          animation: avatar-pulse 3.5s ease-in-out infinite;
+        }
+        .space-avatar img,
+        .space-avatar span {
+          width: 100%;
+          height: 100%;
+          display: grid;
+          place-items: center;
+          object-fit: cover;
+          border-radius: 50%;
+          background: #080b14;
+          color: #fff;
+          font: 800 1.2rem var(--font-heading);
+        }
+        .neon-orbit {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          border: 1px solid rgba(0, 240, 255, 0.38);
+          border-radius: 50%;
+          box-shadow: 0 0 12px rgba(0, 240, 255, 0.2), inset 0 0 12px rgba(121, 40, 202, 0.12);
+          transform: translate(-50%, -50%) rotateX(66deg) rotateZ(-8deg);
+        }
+        .orbit-one { width: 270px; height: 270px; }
+        .question-orbit-ring {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          border: 1px solid rgba(0, 240, 255, 0.12);
+          border-radius: 50%;
+          box-shadow: 0 0 5px rgba(0, 240, 255, 0.12), inset 0 0 5px rgba(0, 240, 255, 0.06);
+        }
+        .question-orbit-ring.ring-1 { border-color: rgba(139, 92, 246, 0.13); }
+        .question-orbit-ring.ring-2 { border-color: rgba(255, 191, 63, 0.11); }
+        .space-orbiter {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          z-index: 4;
+          width: 0;
+          height: 0;
+          animation: orbit-space 21s linear infinite;
+        }
+        .space-orbiter > span {
+          position: absolute;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          padding: 5px 8px;
+          border: 1px solid rgba(255,255,255,.2);
+          border-radius: 999px;
+          color: #fff;
+          background: rgba(5, 9, 18, 0.78);
+          backdrop-filter: blur(9px);
+          box-shadow: 0 0 12px rgba(0,240,255,.18);
+          font: 600 0.58rem var(--font-mono);
+          white-space: nowrap;
+        }
+        .difficulty-orbiter { animation-name: orbit-inner; }
+        .difficulty-orbiter > span { transform: translate(-50%, -50%); }
+        .difficulty-orbiter b { font-size: .76rem; }
+        .difficulty-orbiter.easy > span { color: #5ee9b5; border-color: rgba(52,211,153,.45); }
+        .difficulty-orbiter.medium > span { color: #ffd166; border-color: rgba(251,191,36,.45); }
+        .difficulty-orbiter.hard > span { color: #ff7b8d; border-color: rgba(248,113,113,.45); }
+        .problem-orbiter {
+          animation-name: orbit-question;
+          animation-duration: var(--question-orbit-duration);
+          animation-delay: var(--question-orbit-delay);
+        }
+        .problem-orbiter > span {
+          max-width: 145px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          transform: translate(-50%, -50%);
+          color: rgba(225, 245, 255, .88);
+          font-size: .52rem;
+        }
+        @keyframes orbit-question {
+          0% {
+            transform: rotate(var(--question-orbit-angle)) translate(var(--question-orbit-radius), 0) rotate(calc(-1 * var(--question-orbit-angle)));
+          }
+          25% {
+            transform: rotate(var(--question-orbit-angle)) translate(0, var(--question-orbit-y)) rotate(calc(-1 * var(--question-orbit-angle)));
+          }
+          50% {
+            transform: rotate(var(--question-orbit-angle)) translate(calc(-1 * var(--question-orbit-radius)), 0) rotate(calc(-1 * var(--question-orbit-angle)));
+          }
+          75% {
+            transform: rotate(var(--question-orbit-angle)) translate(0, calc(-1 * var(--question-orbit-y))) rotate(calc(-1 * var(--question-orbit-angle)));
+          }
+          100% {
+            transform: rotate(var(--question-orbit-angle)) translate(var(--question-orbit-radius), 0) rotate(calc(-1 * var(--question-orbit-angle)));
+          }
+        }
+        @keyframes orbit-inner {
+          from { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+          to { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+        }
+        @keyframes orbit-space {
+          from { transform: rotate(0deg) translateX(202px) rotate(0deg); }
+          to { transform: rotate(360deg) translateX(202px) rotate(-360deg); }
+        }
+        @keyframes avatar-pulse {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); }
+          50% { transform: translate(-50%, -50%) scale(1.055); }
+        }
+        @media (max-width: 900px) {
+          .leetcode-space { left: 50%; top: 56%; transform: translate(-50%, -50%) scale(.78); opacity: .72; }
+          .problem-orbiter { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .space-orbiter, .space-avatar { animation-play-state: paused; }
+        }
+      `}</style>
+    </>
   );
 }

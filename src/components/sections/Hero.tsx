@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { usePortfolio } from '@/context/PortfolioContext';
 import {
   ArrowRight,
@@ -20,6 +20,10 @@ interface LeetCodeProfile {
   avatarUrl: string | null;
   ranking: number | null;
   solved: number;
+  difficulty: { easy: number; medium: number; hard: number };
+  submissionCalendar: Record<string, number>;
+  activity: Array<{ date: string; count: number }>;
+  recentAccepted: Array<{ title: string; titleSlug: string; timestamp: string; url: string }>;
   updatedAt: string;
 }
 
@@ -31,6 +35,12 @@ export default function Hero() {
   const [leetcodeProfile, setLeetcodeProfile] = useState<LeetCodeProfile | null>(null);
 
   const roles = data.personal.roles || ['Software Developer', 'Full-Stack Engineer'];
+  const lastThirtyDays = useMemo(() => {
+    return leetcodeProfile?.activity || Array.from(
+      { length: 30 },
+      (_, index) => ({ date: `pending-${index}`, count: 0 })
+    );
+  }, [leetcodeProfile]);
 
   useEffect(() => {
     const currentRole = roles[roleIndex % roles.length];
@@ -334,7 +344,7 @@ export default function Hero() {
                 className="glass-card"
                 style={{ padding: '16px', borderLeft: '3px solid var(--primary)' }}
               >
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                <div className="hud-stat-label" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem' }}>
                   ALMA MATER
                 </div>
                 <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#ffffff', marginTop: '4px' }}>
@@ -347,7 +357,7 @@ export default function Hero() {
                 className="glass-card"
                 style={{ padding: '16px', borderLeft: '3px solid var(--secondary)' }}
               >
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                <div className="hud-stat-label" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem' }}>
                   SPECIALTY
                 </div>
                 <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#ffffff', marginTop: '4px' }}>
@@ -357,14 +367,23 @@ export default function Hero() {
               </div>
 
               <div
-                className="glass-card"
-                style={{ padding: '16px', borderLeft: '3px solid #10b981' }}
+                className="glass-card leetcode-heatmap-card"
+                style={{ padding: '13px 14px 12px 16px', borderLeft: '3px solid #10b981' }}
               >
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-                  CODE HOURS
+                <div className="heatmap-heading">
+                  <span>30 DAY ACTIVITY</span>
                 </div>
-                <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#10b981', marginTop: '4px' }}>
-                  {data.stats.codeHours}
+                <div className="leetcode-heatmap" aria-label="LeetCode submission activity over the last 30 days">
+                  {lastThirtyDays.map((day) => {
+                    const level = day.count === 0 ? 0 : day.count < 3 ? 1 : day.count < 6 ? 2 : day.count < 10 ? 3 : 4;
+                    return (
+                      <span
+                        key={day.date}
+                        className={`heatmap-cell level-${level}`}
+                        title={`${new Date(day.date).toLocaleDateString()}: ${day.count} submissions`}
+                      />
+                    );
+                  })}
                 </div>
               </div>
 
@@ -373,7 +392,7 @@ export default function Hero() {
                 style={{ padding: '14px 14px 14px 16px', borderLeft: '3px solid #f59e0b' }}
               >
                 <div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+                  <div className="hud-stat-label" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem' }}>
                     LEETCODE SOLVED
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#f59e0b', marginTop: '4px' }}>
@@ -396,7 +415,7 @@ export default function Hero() {
                   aria-label="Open Rupesh Kumar's LeetCode profile"
                 >
                   {leetcodeProfile?.avatarUrl ? (
-                    <img src={leetcodeProfile.avatarUrl} alt="Rupesh Kumar on LeetCode" />
+                    <img src="/api/leetcode?avatar=1" alt="Rupesh Kumar on LeetCode" />
                   ) : (
                     <span>3R</span>
                   )}
@@ -428,6 +447,62 @@ export default function Hero() {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
         }
+        .hero-hud-card {
+          background:
+            radial-gradient(90% 55% at 5% 0%, rgba(255, 255, 255, 0.18), transparent 55%),
+            linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.018) 48%, rgba(0, 240, 255, 0.025)),
+            rgba(255, 255, 255, 0.035) !important;
+          backdrop-filter: blur(12px) saturate(170%) contrast(1.06) !important;
+          -webkit-backdrop-filter: blur(12px) saturate(170%) contrast(1.06) !important;
+          border-color: rgba(220, 248, 255, 0.38) !important;
+          box-shadow:
+            0 30px 80px rgba(0, 0, 0, 0.3),
+            0 0 28px rgba(0, 240, 255, 0.16),
+            inset 0 2px 1px rgba(255, 255, 255, 0.72),
+            inset 2px 0 1px rgba(180, 244, 255, 0.28),
+            inset -1.5px 0 1px rgba(165, 110, 255, 0.2),
+            inset 0 -2px 2px rgba(0, 0, 0, 0.24) !important;
+        }
+        .hero-hud-card::before {
+          content: '';
+          position: absolute;
+          inset: 1px;
+          z-index: 0;
+          border-radius: inherit;
+          pointer-events: none;
+          background:
+            linear-gradient(112deg, transparent 8%, rgba(255, 255, 255, 0.16) 18%, transparent 31%),
+            radial-gradient(55% 18% at 28% 0%, rgba(255, 255, 255, 0.34), transparent 70%),
+            radial-gradient(32% 45% at 100% 100%, rgba(0, 240, 255, 0.1), transparent 72%);
+          mix-blend-mode: screen;
+          opacity: 0.88;
+        }
+        .hero-hud-card > * {
+          position: relative;
+          z-index: 1;
+        }
+        .hero-hud-card .glass-card {
+          background:
+            linear-gradient(140deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.018) 55%),
+            rgba(255, 255, 255, 0.04) !important;
+          backdrop-filter: blur(10px) saturate(155%) !important;
+          -webkit-backdrop-filter: blur(10px) saturate(155%) !important;
+          border-color: rgba(255, 255, 255, 0.22) !important;
+          box-shadow:
+            inset 0 1.5px 1px rgba(255, 255, 255, 0.48),
+            inset 1px 0 1px rgba(120, 230, 255, 0.18),
+            inset 0 -1.5px 1px rgba(0, 0, 0, 0.2),
+            0 12px 28px rgba(0, 0, 0, 0.15) !important;
+        }
+        .hud-stat-label,
+        .heatmap-heading {
+          color: rgba(229, 238, 250, 0.88) !important;
+          font-weight: 700 !important;
+          letter-spacing: 0.075em;
+          text-shadow:
+            0 1px 2px rgba(0, 0, 0, 0.95),
+            0 0 8px rgba(0, 240, 255, 0.2);
+        }
         .leetcode-stat-card {
           display: flex;
           align-items: center;
@@ -435,12 +510,48 @@ export default function Hero() {
           gap: 10px;
           min-width: 0;
         }
+        .leetcode-heatmap-card {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          min-width: 0;
+        }
+        .heatmap-heading {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          margin-bottom: 8px;
+          color: var(--text-dim);
+          font: 600 0.58rem var(--font-mono);
+          white-space: nowrap;
+        }
+        .leetcode-heatmap {
+          display: grid;
+          grid-template-rows: repeat(7, 8px);
+          grid-auto-flow: column;
+          grid-auto-columns: 8px;
+          justify-content: space-between;
+          gap: 3px;
+        }
+        .heatmap-cell {
+          width: 8px;
+          height: 8px;
+          border-radius: 2.5px;
+          background: rgba(255, 255, 255, 0.09);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+        .heatmap-cell.level-1 { background: #0e6b3a; }
+        .heatmap-cell.level-2 { background: #16a34a; box-shadow: 0 0 5px rgba(34, 197, 94, 0.25); }
+        .heatmap-cell.level-3 { background: #4ade80; box-shadow: 0 0 7px rgba(74, 222, 128, 0.38); }
+        .heatmap-cell.level-4 { background: #bbf7d0; box-shadow: 0 0 9px rgba(134, 239, 172, 0.6); }
         .leetcode-handle {
           display: block;
           margin-top: 2px;
-          color: var(--text-muted);
+          color: rgba(226, 232, 240, 0.86);
           font: 500 0.62rem var(--font-mono);
           text-decoration: none;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
         }
         .leetcode-avatar-shell {
           position: relative;
