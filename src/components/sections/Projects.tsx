@@ -103,7 +103,7 @@ export default function Projects() {
         className="projects-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
+          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
           gap: '24px',
         }}
       >
@@ -123,8 +123,9 @@ export default function Projects() {
               <div>
                 {/* Visual Gradient Banner / Header */}
                 <div
+                  className="project-preview"
                   style={{
-                    height: '130px',
+                    height: '210px',
                     borderRadius: '12px',
                     background: project.imageGradient,
                     marginBottom: '16px',
@@ -136,7 +137,20 @@ export default function Projects() {
                     overflow: 'hidden',
                   }}
                 >
+                  {project.liveUrl && (
+                    <iframe
+                      src={project.liveUrl}
+                      title={`Live preview of ${project.title}`}
+                      loading="lazy"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                      tabIndex={-1}
+                      className="project-preview-frame"
+                    />
+                  )}
+                  <div className="project-preview-shade" aria-hidden="true" />
                   <div
+                    className="project-preview-topline"
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -176,9 +190,14 @@ export default function Projects() {
                         <span>FEATURED</span>
                       </span>
                     )}
+                    {project.liveUrl && !project.featured && (
+                      <span className="project-live-status">
+                        <span /> LIVE PREVIEW
+                      </span>
+                    )}
                   </div>
 
-                  <div style={{ color: '#ffffff', fontWeight: 800, fontSize: '1.25rem' }}>
+                  <div className="project-preview-title" style={{ color: '#ffffff', fontWeight: 800, fontSize: '1.25rem' }}>
                     {project.title}
                   </div>
                 </div>
@@ -235,10 +254,10 @@ export default function Projects() {
 
               {/* Action Buttons */}
               <div
-                className="project-card-actions"
+                className={`project-card-actions ${project.liveUrl ? 'has-live-preview' : 'no-live-preview'}`}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: project.liveUrl ? 'minmax(0, 1fr) auto auto' : 'minmax(0, 1fr) auto',
+                  gridTemplateColumns: project.liveUrl ? 'repeat(3, minmax(0, 1fr))' : 'minmax(0, 1fr) auto',
                   alignItems: 'center',
                   gap: '10px',
                   paddingTop: '16px',
@@ -423,6 +442,11 @@ export default function Projects() {
       )}
 
       <style jsx>{`
+        @media (max-width: 1050px) {
+          .projects-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+        }
         @media (max-width: 640px) {
           .projects-grid {
             grid-template-columns: 1fr !important;
@@ -430,6 +454,9 @@ export default function Projects() {
           }
           .project-card {
             padding: 18px 14px !important;
+          }
+          .project-preview {
+            height: 190px !important;
           }
           .project-modal-panel {
             padding: 22px 16px !important;
@@ -440,7 +467,10 @@ export default function Projects() {
             font-size: 0.78rem !important;
           }
           .project-card-actions {
-            grid-template-columns: minmax(0, 1fr) auto auto !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+          }
+          .project-card-actions.no-live-preview {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
           }
           .project-card-actions > * {
             min-width: 0;
@@ -448,6 +478,55 @@ export default function Projects() {
             padding: 10px 12px !important;
             white-space: nowrap;
           }
+          .project-card-actions .project-live-button,
+          .project-card-actions .project-source-button,
+          .project-card-actions .project-details-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
+        .project-preview-frame {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          border: 0;
+          background: #090c14;
+          pointer-events: none;
+        }
+        .project-preview-shade {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(180deg, rgba(3, 5, 10, 0.7) 0%, transparent 35%, transparent 52%, rgba(3, 5, 10, 0.88) 100%);
+        }
+        .project-preview-topline,
+        .project-preview-title {
+          position: relative;
+          z-index: 2;
+          pointer-events: none;
+        }
+        .project-preview-title {
+          text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+        }
+        .project-live-status {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 8px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 999px;
+          color: #fff;
+          background: rgba(3, 7, 15, 0.65);
+          backdrop-filter: blur(10px);
+          font: 700 0.62rem var(--font-mono);
+        }
+        .project-live-status span {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #22c55e;
+          box-shadow: 0 0 8px #22c55e;
         }
         @media (max-width: 440px) {
           .project-card-actions {

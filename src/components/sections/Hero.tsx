@@ -14,11 +14,21 @@ import {
   GraduationCap,
 } from 'lucide-react';
 
+interface LeetCodeProfile {
+  username: string;
+  realName: string;
+  avatarUrl: string | null;
+  ranking: number | null;
+  solved: number;
+  updatedAt: string;
+}
+
 export default function Hero() {
   const { data, playSound } = usePortfolio();
   const [roleIndex, setRoleIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [leetcodeProfile, setLeetcodeProfile] = useState<LeetCodeProfile | null>(null);
 
   const roles = data.personal.roles || ['Software Developer', 'Full-Stack Engineer'];
 
@@ -43,6 +53,29 @@ export default function Hero() {
 
     return () => clearTimeout(timeout);
   }, [displayedText, isDeleting, roleIndex, roles]);
+
+  useEffect(() => {
+    let active = true;
+
+    const refreshLeetCodeProfile = async () => {
+      try {
+        const response = await fetch('/api/leetcode');
+        if (!response.ok) return;
+        const profile = (await response.json()) as LeetCodeProfile;
+        if (active) setLeetcodeProfile(profile);
+      } catch {
+        // Keep the configured portfolio fallback when LeetCode is unavailable.
+      }
+    };
+
+    refreshLeetCodeProfile();
+    const refreshTimer = window.setInterval(refreshLeetCodeProfile, 30 * 60 * 1000);
+
+    return () => {
+      active = false;
+      window.clearInterval(refreshTimer);
+    };
+  }, []);
 
   return (
     <section
@@ -336,15 +369,38 @@ export default function Hero() {
               </div>
 
               <div
-                className="glass-card"
-                style={{ padding: '16px', borderLeft: '3px solid #f59e0b' }}
+                className="glass-card leetcode-stat-card"
+                style={{ padding: '14px 14px 14px 16px', borderLeft: '3px solid #f59e0b' }}
               >
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-                  PROBLEMS SOLVED
+                <div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+                    LEETCODE SOLVED
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#f59e0b', marginTop: '4px' }}>
+                    {leetcodeProfile ? leetcodeProfile.solved.toLocaleString() : data.stats.problemSolved}
+                  </div>
+                  <a
+                    href="https://leetcode.com/u/3rupeshkr/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="leetcode-handle interactive"
+                  >
+                    @3rupeshkr
+                  </a>
                 </div>
-                <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#f59e0b', marginTop: '4px' }}>
-                  {data.stats.problemSolved}
-                </div>
+                <a
+                  href="https://leetcode.com/u/3rupeshkr/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="leetcode-avatar-shell interactive"
+                  aria-label="Open Rupesh Kumar's LeetCode profile"
+                >
+                  {leetcodeProfile?.avatarUrl ? (
+                    <img src={leetcodeProfile.avatarUrl} alt="Rupesh Kumar on LeetCode" />
+                  ) : (
+                    <span>3R</span>
+                  )}
+                </a>
               </div>
             </div>
 
@@ -371,6 +427,51 @@ export default function Hero() {
         @keyframes blink {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
+        }
+        .leetcode-stat-card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          min-width: 0;
+        }
+        .leetcode-handle {
+          display: block;
+          margin-top: 2px;
+          color: var(--text-muted);
+          font: 500 0.62rem var(--font-mono);
+          text-decoration: none;
+        }
+        .leetcode-avatar-shell {
+          position: relative;
+          width: 54px;
+          height: 54px;
+          flex: 0 0 54px;
+          display: grid;
+          place-items: center;
+          padding: 3px;
+          border-radius: 18px;
+          color: #090b10;
+          font: 800 0.8rem var(--font-heading);
+          text-decoration: none;
+          background: conic-gradient(from 45deg, #f59e0b, #fff3b0, #00f0ff, #8b5cf6, #f59e0b);
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.28), inset 0 0 10px rgba(255, 255, 255, 0.5);
+          transform: rotate(3deg);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .leetcode-avatar-shell:hover {
+          transform: rotate(0) scale(1.06);
+          box-shadow: 0 0 28px rgba(245, 158, 11, 0.48), 0 0 14px var(--primary-glow);
+        }
+        .leetcode-avatar-shell img,
+        .leetcode-avatar-shell > span {
+          width: 100%;
+          height: 100%;
+          display: grid;
+          place-items: center;
+          border-radius: 15px;
+          object-fit: cover;
+          background: #111827;
         }
         @media (max-width: 960px) {
           .hero-grid {

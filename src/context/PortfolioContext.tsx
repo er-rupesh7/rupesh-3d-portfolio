@@ -53,14 +53,28 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved) as PortfolioData;
+        const retiredDemoUrls = new Set([
+          'https://cognitivepulse-ai.vercel.app',
+          'https://devsync-studio.vercel.app',
+          'https://quantumvault-sec.vercel.app',
+          'https://cybermatrix-terminal.vercel.app',
+        ]);
 
         // Migrate the retired Aetheria card without discarding any other
         // portfolio customizations already saved through the admin panel.
-        parsed.projects = parsed.projects.map((project) =>
-          project.id === 'proj-1' && project.title.toLowerCase().includes('aetheria')
-            ? initialPortfolioData.projects[0]
-            : project
-        );
+        parsed.projects = parsed.projects.map((project) => {
+          if (project.id === 'proj-1' && project.title.toLowerCase().includes('aetheria')) {
+            return initialPortfolioData.projects[0];
+          }
+          if (project.id === 'proj-2' && project.title.toLowerCase().includes('omnicloud')) {
+            return initialPortfolioData.projects[1];
+          }
+          if (project.liveUrl && retiredDemoUrls.has(project.liveUrl)) {
+            const { liveUrl: _retiredUrl, ...projectWithoutPreview } = project;
+            return projectWithoutPreview;
+          }
+          return project;
+        });
         setData(parsed);
       }
     } catch (e) {
