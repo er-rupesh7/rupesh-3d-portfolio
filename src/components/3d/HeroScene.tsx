@@ -90,9 +90,12 @@ export default function HeroScene() {
     const innerGeom = new THREE.IcosahedronGeometry(3.2, 0);
     const innerMat = new THREE.MeshStandardMaterial({
       color: colors.core,
-      roughness: 0.2,
-      metalness: 0.8,
-      wireframe: false,
+      roughness: 0.35,
+      metalness: 0.65,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.12,
+      depthWrite: false,
     });
     const innerMesh = new THREE.Mesh(innerGeom, innerMat);
     coreGroup.add(innerMesh);
@@ -306,6 +309,7 @@ export default function HeroScene() {
           <div className="space-avatar">
             {leetcode.avatarUrl ? <img src="/api/leetcode?avatar=1" alt="" /> : <span>3R</span>}
           </div>
+          <div className="avatar-icosphere-foreground" />
 
           {difficultyStats.map((stat, index) => (
             <div
@@ -325,8 +329,11 @@ export default function HeroScene() {
             const planeRatio = planeRatios[index % planeRatios.length];
             const planeAngle = planeAngles[index % planeAngles.length];
             const orbitStyle = {
+              '--question-orbit-index': index,
               '--question-orbit-radius': `${radius}px`,
               '--question-orbit-y': `${radius * planeRatio}px`,
+              '--question-mobile-radius': `${230 - index * 7}px`,
+              '--question-mobile-y': `${(230 - index * 7) * planeRatio}px`,
               '--question-orbit-angle': `${planeAngle}deg`,
               '--question-orbit-duration': `${58 - index * 2.25}s`,
               '--question-orbit-delay': `${index * -3.15}s`,
@@ -337,6 +344,8 @@ export default function HeroScene() {
                 <div
                   className={`question-orbit-ring ring-${index % 3}`}
                   style={{
+                    '--question-mobile-radius': `${230 - index * 7}px`,
+                    '--question-mobile-y': `${(230 - index * 7) * planeRatio}px`,
                     width: radius * 2,
                     height: radius * 2 * planeRatio,
                     transform: `translate(-50%, -50%) rotate(${planeAngle}deg)`,
@@ -375,8 +384,19 @@ export default function HeroScene() {
           border-radius: 50%;
           display: grid;
           place-items: center;
-          background: conic-gradient(from 30deg, #00f0ff, #8b5cf6, #ffbf3f, #00f0ff);
-          box-shadow: 0 0 22px var(--primary), 0 0 60px var(--primary-glow), inset 0 0 14px #fff;
+          background: conic-gradient(
+            from 30deg,
+            var(--primary),
+            color-mix(in srgb, var(--primary) 38%, white),
+            var(--primary),
+            color-mix(in srgb, var(--primary) 72%, transparent),
+            var(--primary)
+          );
+          box-shadow:
+            0 0 18px var(--primary),
+            0 0 48px var(--primary-glow),
+            0 0 90px color-mix(in srgb, var(--primary) 22%, transparent),
+            inset 0 0 14px rgba(255, 255, 255, 0.8);
           animation: avatar-pulse 3.5s ease-in-out infinite;
         }
         .space-avatar img,
@@ -390,6 +410,41 @@ export default function HeroScene() {
           background: #080b14;
           color: #fff;
           font: 800 1.2rem var(--font-heading);
+        }
+        .avatar-icosphere-foreground {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          z-index: 6;
+          width: 306px;
+          height: 306px;
+          transform: translate(-50%, -50%);
+          border: 1px solid color-mix(in srgb, var(--primary) 72%, transparent);
+          border-radius: 50%;
+          pointer-events: none;
+          opacity: 0.72;
+          background:
+            linear-gradient(32deg, transparent 49.3%, color-mix(in srgb, var(--primary) 56%, transparent) 49.7%, color-mix(in srgb, var(--primary) 56%, transparent) 50.3%, transparent 50.7%),
+            linear-gradient(148deg, transparent 49.3%, color-mix(in srgb, var(--primary) 42%, transparent) 49.7%, color-mix(in srgb, var(--primary) 42%, transparent) 50.3%, transparent 50.7%),
+            radial-gradient(ellipse at center, transparent 57%, color-mix(in srgb, var(--primary) 32%, transparent) 58%, transparent 59%);
+          box-shadow:
+            0 0 12px color-mix(in srgb, var(--primary) 34%, transparent),
+            inset 0 0 16px color-mix(in srgb, var(--primary) 14%, transparent);
+          animation: icosphere-foreground-spin 18s linear infinite;
+        }
+        .avatar-icosphere-foreground::before,
+        .avatar-icosphere-foreground::after {
+          content: '';
+          position: absolute;
+          inset: 13%;
+          border: 1px solid color-mix(in srgb, var(--primary) 36%, transparent);
+          border-radius: 50%;
+          transform: rotateX(68deg) rotateZ(28deg);
+          box-shadow: 0 0 8px color-mix(in srgb, var(--primary) 24%, transparent);
+        }
+        .avatar-icosphere-foreground::after {
+          inset: 5%;
+          transform: rotateY(70deg) rotateZ(-24deg);
         }
         .neon-orbit {
           position: absolute;
@@ -457,23 +512,31 @@ export default function HeroScene() {
         @keyframes orbit-question {
           0% {
             transform: rotate(var(--question-orbit-angle)) translate(var(--question-orbit-radius), 0) rotate(calc(-1 * var(--question-orbit-angle)));
+            z-index: 3;
           }
           25% {
             transform: rotate(var(--question-orbit-angle)) translate(0, var(--question-orbit-y)) rotate(calc(-1 * var(--question-orbit-angle)));
+            z-index: 8;
           }
           50% {
             transform: rotate(var(--question-orbit-angle)) translate(calc(-1 * var(--question-orbit-radius)), 0) rotate(calc(-1 * var(--question-orbit-angle)));
+            z-index: 3;
           }
           75% {
             transform: rotate(var(--question-orbit-angle)) translate(0, calc(-1 * var(--question-orbit-y))) rotate(calc(-1 * var(--question-orbit-angle)));
+            z-index: 2;
           }
           100% {
             transform: rotate(var(--question-orbit-angle)) translate(var(--question-orbit-radius), 0) rotate(calc(-1 * var(--question-orbit-angle)));
+            z-index: 3;
           }
         }
         @keyframes orbit-inner {
-          from { transform: rotate(0deg) translateX(150px) rotate(0deg); }
-          to { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+          0% { transform: rotate(0deg) translateX(150px) rotate(0deg); z-index: 3; }
+          25% { z-index: 8; }
+          50% { z-index: 3; }
+          75% { z-index: 2; }
+          100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); z-index: 3; }
         }
         @keyframes orbit-space {
           from { transform: rotate(0deg) translateX(202px) rotate(0deg); }
@@ -483,12 +546,36 @@ export default function HeroScene() {
           0%, 100% { transform: translate(-50%, -50%) scale(1); }
           50% { transform: translate(-50%, -50%) scale(1.055); }
         }
+        @keyframes icosphere-foreground-spin {
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
         @media (max-width: 900px) {
-          .leetcode-space { left: 50%; top: 56%; transform: translate(-50%, -50%) scale(.78); opacity: .72; }
-          .problem-orbiter { display: none; }
+          .leetcode-space { left: 50%; top: 56%; transform: translate(-50%, -50%) scale(.72); opacity: .82; }
+          .problem-orbiter {
+            --question-orbit-radius: var(--question-mobile-radius) !important;
+            --question-orbit-y: var(--question-mobile-y) !important;
+          }
+          .problem-orbiter > span {
+            max-width: 96px;
+            padding: 4px 6px;
+            font-size: .46rem;
+          }
+          .question-orbit-ring {
+            width: calc(var(--question-mobile-radius) * 2) !important;
+            height: calc(var(--question-mobile-y) * 2) !important;
+          }
+          .space-avatar {
+            width: 154px;
+            height: 154px;
+          }
+          .avatar-icosphere-foreground {
+            width: 260px;
+            height: 260px;
+          }
         }
         @media (prefers-reduced-motion: reduce) {
-          .space-orbiter, .space-avatar { animation-play-state: paused; }
+          .space-orbiter, .space-avatar, .avatar-icosphere-foreground { animation-play-state: paused; }
         }
       `}</style>
     </>
